@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Map Diary</title>
+    
+    <!-- Leaflet CSS einbinden[cite: 11] -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Eigenes CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Container für die Leaflet-Karte[cite: 11] -->
+    <div id="map"></div>
+
+    <!-- Versteckte Sidebar für die Reise-Ansicht -->
+    <div id="sidebar">
+        <button id="close-sidebar">Schließen ✖</button>
+        <div id="sidebar-content">
+            <h2>Reise Details</h2>
+            <p>Hier landen später unsere chronologischen Bilder und Texte...</p>
+        </div>
+    </div>
+
+    <!-- Leaflet JS einbinden[cite: 11] -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Unsere Logik -->
+    <script src="js/app.js"></script>
+</body>
+</html>

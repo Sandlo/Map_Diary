@@ -1,0 +1,49 @@
+/* Reset für saubere Ränder */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Karte nimmt den ganzen Platz ein[cite: 11] */
+#map {
+    height: 100vh;
+    width: 100%;
+    z-index: 1; /* Bleibt im Hintergrund */
+}
+
+/* Elegante Sidebar */
+#sidebar {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Startposition: Versteckt */
+    width: 350px;
+    height: 100vh;
+    background: #f9f9f9;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    transition: right 0.3s ease-in-out; /* Weiche Animation */
+    z-index: 1000; /* Liegt ÜBER der Karte */
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto; /* Scrollbar, falls viel Text/Bilder */
+}
+
+/* Diese Klasse wird per JavaScript hinzugefügt, um die Sidebar reinzuschieben */
+#sidebar.active {
+    right: 0;
+}
+
+#close-sidebar {
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+}
+
+#close-sidebar:hover {
+    background: #cc0000;
+}
