@@ -1,0 +1,29 @@
+body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+#map { height: 100vh; width: 100%; z-index: 1; }
+
+#sidebar { position: fixed; top: 0; right: -400px; width: 380px; height: 100vh; background: #f9f9f9; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: right 0.3s ease-in-out; z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+#sidebar.active { right: 0; }
+#close-sidebar { background: #ff4d4d; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; float: right; margin-bottom: 20px; }
+#close-sidebar:hover { background: #cc0000; }
+
+.hidden { display: none !important; }
+#pin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.modal-content { background: white; padding: 25px; border-radius: 8px; width: 320px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+.modal-content input, .modal-content textarea, .modal-content button { padding: 10px; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+.modal-content button { background: #0078D7; color: white; border: none; cursor: pointer; font-weight: bold; }
+.modal-content button:hover { background: #005a9e; }
+#close-modal { cursor: pointer; align-self: flex-end; font-size: 20px; font-weight: bold; color: #555; }
+
+/* --- NEU: Timeline Design --- */
+.timeline { border-left: 3px solid #0078D7; padding-left: 20px; margin-left: 10px; margin-top: 20px; }
+.timeline-item { position: relative; margin-bottom: 30px; }
+.timeline-item::before { content: ''; position: absolute; left: -29px; top: 0; width: 12px; height: 12px; background: white; border: 3px solid #0078D7; border-radius: 50%; }
+.timeline-date { font-weight: bold; color: #0078D7; font-size: 14px; display: block; margin-bottom: 5px; }
+.timeline-title { font-size: 18px; margin: 0 0 10px 0; }
+.timeline-desc { font-size: 14px; color: #444; margin-bottom: 15px; line-height: 1.4; }
+
+/* --- NEU: Bilder Karussell --- */
+.carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 10px; }
+.carousel img { flex: 0 0 100%; scroll-snap-align: center; border-radius: 6px; object-fit: cover; max-height: 250px; background: #eee; }
+.carousel::-webkit-scrollbar { height: 6px; }
+.carousel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }

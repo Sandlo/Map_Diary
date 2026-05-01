@@ -1,0 +1,21 @@
+# --- Python / Umgebung ---
+# Virtuelle Umgebung (niemals pushen!)
+venv/
+env/
+
+# Python Cache-Dateien
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- App Daten ---
+# Lokale Datenbank
+backend/diary.json
+
+# Hochgeladene User-Bilder
+backend/uploads/
+
+# --- Betriebssystem Artefakte ---
+.DS_Store
+Thumbs.db
