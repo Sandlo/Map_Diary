@@ -6,12 +6,18 @@ const API_BASE = 'http://localhost:5000';
 // =========================
 // MAP SETUP
 // =========================
-const map = L.map('map').setView([50.0, 10.0], 4);
+const map = L.map('map', {
+    maxBounds: L.latLngBounds(L.latLng(-90, -180), L.latLng(90, 180)),
+    maxBoundsViscosity: 1.0,
+    zoomSnap: 0.9,
+}).setView([50.0, 10.0], 4);
 
 L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
   maxZoom: 19,
+  minZoom: 2,
   attribution: '© OpenStreetMap'
 }).addTo(map);
+
 
 // Marker clustering group
 let clusterGroup = L.markerClusterGroup();
