@@ -5,29 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Travel Map Diary</title>
 
-  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <!-- MarkerCluster -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
-  <!-- App CSS -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
-<header id="topbar">
-    
-
+<body>
+  <header id="topbar">
     <div class="topbar-filters">
+      <span class="filter-label">Ansicht Filtern:</span>
+      
+      <select id="map-style-filter">
+        <option value="karte">Karten-Ansicht</option>
+        <option value="satellit">Satelliten-Ansicht</option>
+      </select>
+
       <select id="map-filter-user">
         <option value="">Alle Nutzer</option>
       </select>
-
       <select id="map-filter-trip">
         <option value="">Alle Reisen</option>
       </select>
-
       <select id="map-filter-year">
         <option value="">Alle Jahre</option>
       </select>
@@ -40,108 +41,138 @@
     </div>
 
     <div class="topbar-right">
-      <button id="open-sidebar-btn" type="button">☰ Reisen</button>
-      <button id="add-pin-btn" type="button">＋ Neuer Pin</button>
+      <button id="open-sidebar-btn" type="button" class="btn-primary">☰ Reisen Filtern</button>
     </div>
-</header>
+  </header>
 
-<body>
-  <!-- MAP -->
   <div id="map"></div>
 
-  <!-- SIDEBAR -->
   <div id="sidebar">
-    <button id="close-sidebar" type="button">Schließen ✖</button>
+    <button id="close-sidebar" type="button" class="btn-danger-outline">Schließen ✖</button>
 
-    <h3>Reisen</h3>
+    <h3>Reisen Filtern</h3>
 
-    <!-- Sidebar Filter -->
     <div class="filters">
       <select id="filter-user">
         <option value="">Alle Nutzer</option>
       </select>
-
       <select id="filter-trip">
         <option value="">Alle Reisen</option>
       </select>
-
       <select id="filter-region">
         <option value="">Alle Länder / Kontinente</option>
       </select>
-
-      <button id="clear-filters" type="button">Filter zurücksetzen</button>
+      <button id="clear-filters" type="button" class="btn-secondary">Filter zurücksetzen</button>
     </div>
 
-    <!-- Trip list -->
     <ul id="trip-list"></ul>
-
     <hr />
-
-    <!-- Timeline -->
     <div id="sidebar-content"></div>
   </div>
 
-  <!-- Sidebar Toggle (must be AFTER sidebar for the ~ selector) -->
-  <button id="sidebar-toggle" type="button" aria-label="Sidebar öffnen/schließen">❯</button>
-
-  <!-- PIN MODAL -->
   <div id="pin-modal" class="hidden">
     <div class="modal-content">
-      <span id="close-modal" title="Schließen">×</span>
-      <h3>Neuen Ort markieren</h3>
+      <span id="close-modal" class="close-btn" title="Schließen">×</span>
+      <h3>Ort markieren</h3>
+      <p class="modal-subtitle">Felder mit * sind Pflichtfelder</p>
 
       <form id="pin-form">
-        <input type="text" id="pin-title" placeholder="Titel (z.B. Tempel in Seoul)" required />
+        <div class="form-group">
+          <label for="pin-title">Titel / Name des Ortes *</label>
+          <input type="text" id="pin-title" placeholder="z.B. Tempel in Seoul" required />
+        </div>
 
-        <input type="date" id="pin-date" required />
-        <input type="time" id="pin-time" required />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pin-date">Datum *</label>
+            <input type="date" id="pin-date" required />
+          </div>
+          <div class="form-group">
+            <label for="pin-time">Uhrzeit *</label>
+            <input type="time" id="pin-time" required />
+          </div>
+        </div>
 
-        <!-- User + Reise mit Vorschlägen -->
-        <input type="text" id="pin-user" list="user-list" placeholder="Nutzer (z.B. Luca)" required />
-        <datalist id="user-list"></datalist>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pin-user">Nutzer *</label>
+            <input type="text" id="pin-user" list="user-list" placeholder="z.B. Luca" required />
+            <datalist id="user-list"></datalist>
+          </div>
+          <div class="form-group">
+            <label for="pin-tag">Reisetitel *</label>
+            <input type="text" id="pin-tag" list="trip-list-datalist" placeholder="z.B. Asien26" required />
+            <datalist id="trip-list-datalist"></datalist>
+          </div>
+        </div>
 
-        <input type="text" id="pin-tag" list="trip-list-datalist" placeholder="Reise (z.B. Asien26)" required />
-        <datalist id="trip-list-datalist"></datalist>
+        <div class="form-group">
+          <label for="pin-type">Kategorie (Optional)</label>
+          <select id="pin-type">
+            <option value="" disabled selected>Ort-Typ wählen…</option>
+            <option>Restaurant</option>
+            <option>Café</option>
+            <option>Bar</option>
+            <option>Sight</option>
+            <option>Museum</option>
+            <option>Aussicht</option>
+            <option>Wanderung</option>
+            <option>Strand</option>
+            <option>Shopping</option>
+            <option>Hotel</option>
+            <option>Transport</option>
+            <option>Sonstiges</option>
+          </select>
+        </div>
 
-        <!-- Ort-Typ -->
-        <select id="pin-type" required>
-          <option value="" disabled selected>Ort-Typ wählen…</option>
-          <option>Restaurant</option>
-          <option>Café</option>
-          <option>Bar</option>
-          <option>Sight</option>
-          <option>Museum</option>
-          <option>Aussicht</option>
-          <option>Wanderung</option>
-          <option>Strand</option>
-          <option>Shopping</option>
-          <option>Hotel</option>
-          <option>Transport</option>
-          <option>Sonstiges</option>
-        </select>
+        <div class="form-group">
+          <label for="pin-desc">Beschreibung (Optional)</label>
+          <textarea id="pin-desc" placeholder="Wie war dein Erlebnis dort?" rows="3"></textarea>
+        </div>
 
-        <!-- Farbe pro Reise -->
-        <label class="color-row">
-          Reise-Farbe:
-          <input type="color" id="pin-trip-color" value="#0078D7" />
-        </label>
+        <div class="form-group">
+          <label for="pin-images">Bilder hochladen (Optional)</label>
+          <input type="file" id="pin-images" accept="image/*" multiple />
+        </div>
 
-        <textarea id="pin-desc" placeholder="Beschreibung deiner Erlebnisse..." rows="3" required></textarea>
-
-        <input type="file" id="pin-images" accept="image/*" multiple required />
-
-        <button type="submit">Speichern</button>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary" style="flex: 1;">Speichern</button>
+          <button type="button" id="modal-delete-pin-btn" class="btn-danger hidden">Löschen</button>
+        </div>
       </form>
     </div>
   </div>
 
-  <!-- Scripts -->
+  <div id="trip-modal" class="hidden">
+    <div class="modal-content" style="width: 300px;">
+      <span id="close-trip-modal" class="close-btn" title="Schließen">×</span>
+      <h3>Reise bearbeiten</h3>
+      <p class="modal-subtitle" id="trip-modal-user">Nutzer</p>
+
+      <form id="trip-form">
+        <div class="form-group">
+          <label for="trip-edit-title">Reisetitel</label>
+          <input type="text" id="trip-edit-title" required />
+        </div>
+
+        <div class="form-group">
+          <label for="trip-edit-color">Farbe der Reise</label>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="color" id="trip-edit-color" required style="width: 50px; height: 40px; padding: 2px; cursor: pointer;" />
+            <span style="font-size: 13px; color: #666;">Gilt für alle Pins</span>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 20px; flex-direction: column;">
+          <button type="submit" class="btn-primary" style="width: 100%;">Änderungen Speichern</button>
+          <button type="button" id="delete-trip-btn" class="btn-danger" style="width: 100%;">Ganze Reise Löschen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- MarkerCluster -->
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-
-  <!-- App -->
   <script src="js/app.js"></script>
 </body>
 </html>
