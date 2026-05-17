@@ -10,6 +10,7 @@ const map = L.map('map').setView([50.0, 10.0], 4);
 
 L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
   maxZoom: 19,
+  minZoom: 2,
   attribution: '© OpenStreetMap'
 }).addTo(map);
 
