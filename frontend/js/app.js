@@ -315,7 +315,7 @@ function openTripTimeline(entry) {
         ${imagesHtml}
       </div>
     `;
-  });*
+  });
 
   html += `</div>`;
   if (sidebarContent) sidebarContent.innerHTML = html;
