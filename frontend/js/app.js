@@ -4,7 +4,7 @@
 const API_BASE = 'http://localhost:5000';
 
 // =========================
-// MAP SETUP (Zwei Ebenen)
+// MAP SETUP (Google Maps Ebenen)
 // =========================
 const map = L.map('map', {
   maxBounds: L.latLngBounds(L.latLng(-90, -180), L.latLng(90, 180)),
@@ -12,20 +12,20 @@ const map = L.map('map', {
   zoomSnap: 0.9,
 }).setView([50.0, 10.0], 4);
 
-// 1. Layer: Standard OSM (Default)
-const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
-  maxZoom: 17, minZoom: 2.5, attribution: '© OpenStreetMap'
+// 1. Layer: Google Maps Standard (Deutsch)
+const googleMapLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=de', {
+  maxZoom: 20, minZoom: 2.5, attribution: '© Google Maps'
 });
 
-// 2. Layer: Satellit Hybrid (Satellitenbilder + Grenzen + Deutsche Labels)
-const satelliteLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=de', {
+// 2. Layer: Google Maps Satellit Hybrid (Satellitenbilder + Grenzen + Deutsche Labels)
+const googleSatLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&hl=de', {
   maxZoom: 20, 
   minZoom: 2.5, 
   attribution: '© Google Maps'
 });
 
-// OSM als Startwert hinzufügen
-osmLayer.addTo(map);
+// Standard-Karte als Startwert hinzufügen
+googleMapLayer.addTo(map);
 
 let clusterGroup = L.markerClusterGroup();
 map.addLayer(clusterGroup);
@@ -43,7 +43,7 @@ const filterTrip = document.getElementById('filter-trip');
 const filterRegion = document.getElementById('filter-region');
 const clearFiltersBtn = document.getElementById('clear-filters');
 
-const mapStyleFilter = document.getElementById('map-style-filter'); // NEU
+const mapStyleFilter = document.getElementById('map-style-filter'); 
 const mapFilterUser = document.getElementById('map-filter-user');
 const mapFilterTrip = document.getElementById('map-filter-trip');
 const mapFilterYear = document.getElementById('map-filter-year');
@@ -70,6 +70,85 @@ const userDatalist = document.getElementById('user-list');
 const tripDatalist = document.getElementById('trip-list-datalist');
 
 // =========================
+// ORT-SUCHE (Geocoding via Backend)
+// =========================
+const searchInput = document.getElementById('map-search-input');
+const searchBtn = document.getElementById('map-search-btn');
+let searchMarker = null; // Speichert den temporären Such-Punkt
+
+// Hilfsfunktion: Ermöglicht es, direkt aus der Suche heraus ein Pin-Modal zu öffnen
+window.triggerPinFromSearch = function(lat, lng) {
+    currentLatLng = L.latLng(lat, lng);
+    if (searchMarker) map.removeLayer(searchMarker); // Suchmarker aufräumen
+    pinForm.reset();
+    if (modalDeletePinBtn) modalDeletePinBtn.classList.add('hidden'); 
+    openPinModal();
+};
+
+if (searchInput && searchBtn) {
+    const performSearch = async () => {
+        const query = searchInput.value.trim();
+        if (!query) return;
+
+        searchBtn.innerHTML = '⏳';
+        
+        try {
+            const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+
+            if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                
+                // 1. Althergebrachten Suchmarker entfernen, falls vorhanden
+                if (searchMarker) {
+                    map.removeLayer(searchMarker);
+                }
+
+                // 2. Zoom auf 17 erhöht, damit Straßen & Hausnummern geladen werden!
+                map.flyTo([lat, lon], 17, { duration: 1.5 });
+
+                // 3. Temporären roten Such-Marker auf die exakte Hausnummer setzen
+                searchMarker = L.marker([lat, lon], {
+                    icon: L.divIcon({
+                        className: '',
+                        html: `<div class="trip-marker" style="background: #ff3333; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.5);"></div>`,
+                        iconSize: [22, 22],
+                        iconAnchor: [11, 11]
+                    })
+                }).addTo(map);
+
+                // 4. Ein Popup mit der exakten Adresse und einem "Pin anlegen"-Button öffnen
+                searchMarker.bindPopup(`
+                    <div style="font-family: inherit; text-align: center;">
+                        <strong style="color: #333;">Ort gefunden:</strong><br>
+                        <span style="font-size: 12px; color: #666;">${escapeHtml(data[0].display_name)}</span>
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 8px 0;">
+                        <button class="btn-primary btn-sm" style="width: 100%;" onclick="window.triggerPinFromSearch(${lat}, ${lon})">＋ Hier Pin anlegen</button>
+                    </div>
+                `).openPopup();
+
+            } else {
+                alert('Ort leider nicht gefunden. Versuche es mit "Straße Hausnummer, Stadt".');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Fehler bei der Suche.');
+        }
+        
+        searchBtn.innerHTML = '🔍';
+    };
+
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
+    });
+}
+
+// =========================
 // GLOBAL DATA
 // =========================
 let allPinsData = null;
@@ -88,11 +167,11 @@ let currentEditTripName = null;
 if (mapStyleFilter) {
     mapStyleFilter.addEventListener('change', (e) => {
         if (e.target.value === 'satellit') {
-            map.removeLayer(osmLayer);
-            satelliteLayer.addTo(map);
+            map.removeLayer(googleMapLayer);
+            googleSatLayer.addTo(map);
         } else {
-            map.removeLayer(satelliteLayer);
-            osmLayer.addTo(map);
+            map.removeLayer(googleSatLayer);
+            googleMapLayer.addTo(map);
         }
     });
 }
@@ -288,16 +367,13 @@ function openTripTimeline(entry) {
     const timeStr = (dateObj && p.datetime) ? dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : (p.time || '');
     const imgArr = Array.isArray(p.images) ? p.images : [];
     
-    // Kategorie (Optional): Wird nur gerendert, wenn eine ausgewählt wurde
     const typeBadge = p.placeType ? `<span style="font-size:12px;background:#e2e8f0;color:#334155;padding:4px 8px;border-radius:6px;">${escapeHtml(p.placeType)}</span>` : '';
 
-    // Bilder (Optional)
     let imagesHtml = '';
     if (imgArr.length > 0) {
       imagesHtml = `<div class="carousel">` + imgArr.map(img => `<img src="${API_BASE}/api/uploads/${encodeURIComponent(img)}" alt="Reisebild">`).join('') + `</div>`;
     }
 
-    // NEU: Beschreibung (Optional): Wird nur gerendert, wenn Text vorhanden ist
     const descHtml = p.description ? `<p class="timeline-desc">${escapeHtml(p.description)}</p>` : '';
 
     html += `

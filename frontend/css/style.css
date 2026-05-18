@@ -18,13 +18,9 @@ body, html {
 }
 
 /* ===============================
-   BUTTONS (Modernisiert)
+   BUTTONS
 =============================== */
-button {
-  transition: all 0.2s ease;
-  transform: scale(1);
-  font-family: inherit;
-}
+button { transition: all 0.2s ease; transform: scale(1); font-family: inherit; }
 button:active { transform: scale(0.96); }
 
 .btn-primary { background: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; }
@@ -42,7 +38,7 @@ button:active { transform: scale(0.96); }
 .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
 
 /* ===============================
-   TOP BAR (Zentrierung & Flex)
+   TOP BAR
 =============================== */
 #topbar {
   position: fixed;
@@ -59,54 +55,62 @@ button:active { transform: scale(0.96); }
 }
 
 .topbar-title-container {
-  /* NEU: Zwingt den Titel exakt in die Bildschirmmitte */
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none; /* Verhindert, dass unsichtbare Boxen Klicks abfangen */
+  position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none;
 }
-
 .topbar-title h1 {
-  margin: 0;
-  font-size: 28px;
-  color: var(--primary);
-  text-align: center;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  pointer-events: auto; 
+  margin: 0; font-size: 28px; color: var(--primary); text-align: center; font-weight: 800; letter-spacing: -0.5px; pointer-events: auto; 
 }
 
-.topbar-filters {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.filter-label { font-weight: 600; color: #475569; font-size: 14px; }
-
-select {
+#search-container { display: flex; gap: 6px; align-items: center; }
+#map-search-input {
   padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
   background: #f8fafc; color: #0f172a; font-family: inherit; font-weight: 500;
-  cursor: pointer; transition: all 0.2s;
+  width: 200px; outline: none; transition: all 0.2s;
 }
-select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15); }
+#map-search-input:focus {
+  border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15); background: white;
+}
+#map-search-btn {
+  background: var(--primary); color: white; border: none; border-radius: 8px;
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+#map-search-btn:hover { background: var(--primary-hover); }
+
+/* ===============================
+   FLOATING MAP FILTERS
+=============================== */
+#map-floating-filters {
+  position: absolute;
+  top: calc(var(--topbar-height) + 10px);
+  left: 60px;
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 6px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  backdrop-filter: blur(5px);
+}
+#map-floating-filters select {
+  padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);
+  background: white; color: #0f172a; font-family: inherit; font-weight: 500;
+  font-size: 13px; cursor: pointer; transition: all 0.2s;
+}
+#map-floating-filters select:focus { outline: none; border-color: var(--primary); }
 
 /* ===============================
    MAP & SIDEBAR
 =============================== */
 #map { 
-  position: absolute; /* Löst das Überlappungs-Problem */
+  position: absolute; 
   top: var(--topbar-height); 
   left: 0;
   width: 100%; 
   height: calc(100vh - var(--topbar-height)); 
   z-index: 1; 
 }
-
-/* Gibt den Leaflet-Buttons oben links etwas Atempause zum Header */
-.leaflet-top {
-  margin-top: 15px;
-}
+.leaflet-top { margin-top: 10px; }
 
 #sidebar {
   position: fixed; top: var(--topbar-height); right: calc(-1 * var(--sidebar-width));
@@ -115,7 +119,27 @@ select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3p
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; padding: 20px; box-sizing: border-box; overflow-y: auto;
 }
 #sidebar.active { right: 0; }
+
+/* FIX: Filter Dropdowns in der Sidebar */
 .filters { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px 0; }
+.filters select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filters select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+}
 
 #trip-list { list-style: none; padding: 0; margin: 10px 0 20px 0; }
 #trip-list li { padding: 12px 16px; background: #f8fafc; margin-bottom: 8px; cursor: pointer; border-radius: 10px; border: 1px solid var(--border); font-weight: 500; transition: all 0.2s ease; }
@@ -176,12 +200,10 @@ label { display: block; font-size: 13px; font-weight: 600; color: #475569; margi
    RESPONSIVE
 =============================== */
 @media (max-width: 1100px) {
-  #topbar {
-    flex-wrap: wrap; height: auto; padding: 15px; gap: 15px;
-  }
-  .topbar-title-container {
-    position: static; transform: none; width: 100%; order: -1; margin-bottom: 5px;
-  }
-  #map { margin-top: 130px; height: calc(100vh - 130px); }
-  #sidebar { top: 130px; height: calc(100vh - 130px); }
+  #topbar { flex-wrap: wrap; height: auto; padding: 15px; gap: 15px; }
+  .topbar-title-container { position: static; transform: none; width: 100%; order: -1; margin-bottom: 5px; }
+  #search-container { order: 2; width: 100%; }
+  #map-search-input { width: 100%; }
+  #map { margin-top: 170px; height: calc(100vh - 170px); }
+  #sidebar { top: 170px; height: calc(100vh - 170px); }
 }

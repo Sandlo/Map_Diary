@@ -6,32 +6,17 @@
   <title>Travel Map Diary</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
   <header id="topbar">
-    <div class="topbar-filters">
-      <span class="filter-label">Ansicht Filtern:</span>
-      
-      <select id="map-style-filter">
-        <option value="karte">Karten-Ansicht</option>
-        <option value="satellit">Satelliten-Ansicht</option>
-      </select>
-
-      <select id="map-filter-user">
-        <option value="">Alle Nutzer</option>
-      </select>
-      <select id="map-filter-trip">
-        <option value="">Alle Reisen</option>
-      </select>
-      <select id="map-filter-year">
-        <option value="">Alle Jahre</option>
-      </select>
+    
+    <div id="search-container">
+      <input type="text" id="map-search-input" placeholder="Ort suchen..." />
+      <button id="map-search-btn" type="button">🔍</button>
     </div>
 
     <div class="topbar-title-container">
@@ -44,6 +29,22 @@
       <button id="open-sidebar-btn" type="button" class="btn-primary">☰ Reisen Filtern</button>
     </div>
   </header>
+
+  <div id="map-floating-filters">
+    <select id="map-style-filter">
+      <option value="karte">Karten-Ansicht</option>
+      <option value="satellit">Satelliten-Ansicht</option>
+    </select>
+    <select id="map-filter-user">
+      <option value="">Alle Nutzer</option>
+    </select>
+    <select id="map-filter-trip">
+      <option value="">Alle Reisen</option>
+    </select>
+    <select id="map-filter-year">
+      <option value="">Alle Jahre</option>
+    </select>
+  </div>
 
   <div id="map"></div>
 

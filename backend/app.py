@@ -122,6 +122,33 @@ def reverse_geocode(lat, lng):
 # API ROUTEN
 # ==========================================
 
+# NEU: Route für die Ortssuche (Geocoding)
+@app.route('/api/search', methods=['GET'])
+def search_place():
+    query = request.args.get('q', '')
+    if not query:
+        return jsonify([])
+
+    base_url = "https://nominatim.openstreetmap.org/search"
+    params = {
+        "q": query,
+        "format": "json",
+        "limit": 5, # Wir holen die besten 5 Treffer
+        "accept-language": "de" # Wir fordern explizit deutsche Namen an
+    }
+    url = base_url + "?" + urllib.parse.urlencode(params)
+    
+    # Sicherer Aufruf mit User-Agent
+    req = urllib.request.Request(url, headers={"User-Agent": "TravelMapDiary-UniProjekt/1.0", "Accept-Language": "de"})
+    try:
+        with urllib.request.urlopen(req, timeout=6) as response:
+            data = json.loads(response.read().decode("utf-8"))
+            return jsonify(data)
+    except Exception as e:
+        print("Such-Fehler:", e)
+        return jsonify([]), 500
+
+
 @app.route('/api/pins', methods=['GET'])
 def get_pins():
     return jsonify(load_diary())
