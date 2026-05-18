@@ -74,12 +74,11 @@ const tripDatalist = document.getElementById('trip-list-datalist');
 // =========================
 const searchInput = document.getElementById('map-search-input');
 const searchBtn = document.getElementById('map-search-btn');
-let searchMarker = null; // Speichert den temporären Such-Punkt
+let searchMarker = null;
 
-// Hilfsfunktion: Ermöglicht es, direkt aus der Suche heraus ein Pin-Modal zu öffnen
 window.triggerPinFromSearch = function(lat, lng) {
     currentLatLng = L.latLng(lat, lng);
-    if (searchMarker) map.removeLayer(searchMarker); // Suchmarker aufräumen
+    if (searchMarker) map.removeLayer(searchMarker);
     pinForm.reset();
     if (modalDeletePinBtn) modalDeletePinBtn.classList.add('hidden'); 
     openPinModal();
@@ -100,15 +99,12 @@ if (searchInput && searchBtn) {
                 const lat = parseFloat(data[0].lat);
                 const lon = parseFloat(data[0].lon);
                 
-                // 1. Althergebrachten Suchmarker entfernen, falls vorhanden
                 if (searchMarker) {
                     map.removeLayer(searchMarker);
                 }
 
-                // 2. Zoom auf 17 erhöht, damit Straßen & Hausnummern geladen werden!
                 map.flyTo([lat, lon], 17, { duration: 1.5 });
 
-                // 3. Temporären roten Such-Marker auf die exakte Hausnummer setzen
                 searchMarker = L.marker([lat, lon], {
                     icon: L.divIcon({
                         className: '',
@@ -118,7 +114,6 @@ if (searchInput && searchBtn) {
                     })
                 }).addTo(map);
 
-                // 4. Ein Popup mit der exakten Adresse und einem "Pin anlegen"-Button öffnen
                 searchMarker.bindPopup(`
                     <div style="font-family: inherit; text-align: center;">
                         <strong style="color: #333;">Ort gefunden:</strong><br>
@@ -247,6 +242,24 @@ function fillDatalist(datalistEl, values) {
     });
 }
 
+// Scroll-Funktion für die Bild-Karussells
+window.scrollCarousel = function(btn, direction) {
+  const container = btn.parentElement.querySelector('.carousel');
+  const images = container.querySelectorAll('img');
+  if (images.length === 0) return;
+
+  const width = container.clientWidth;
+  
+  // Berechnet, welches Bild (0, 1, 2...) aktuell den größten Teil des Bildschirms einnimmt
+  const currentIndex = Math.round(container.scrollLeft / width);
+  
+  // Berechnet das nächste Bild. Der Modulo (%) Operator sorgt für den perfekten Loop!
+  let nextIndex = (currentIndex + direction + images.length) % images.length;
+  
+  // Zwingt den Container, exakt an den Anfang des Zielbildes zu scrollen
+  container.scrollTo({ left: nextIndex * width, behavior: 'smooth' });
+};
+
 // =========================
 // BUILD INDEXES
 // =========================
@@ -371,7 +384,19 @@ function openTripTimeline(entry) {
 
     let imagesHtml = '';
     if (imgArr.length > 0) {
-      imagesHtml = `<div class="carousel">` + imgArr.map(img => `<img src="${API_BASE}/api/uploads/${encodeURIComponent(img)}" alt="Reisebild">`).join('') + `</div>`;
+      if (imgArr.length > 1) {
+        imagesHtml = `
+          <div class="carousel-container">
+            <button class="carousel-btn left" onclick="scrollCarousel(this, -1)">❮</button>
+            <div class="carousel">
+              ${imgArr.map(img => `<img src="${API_BASE}/api/uploads/${encodeURIComponent(img)}" alt="Reisebild">`).join('')}
+            </div>
+            <button class="carousel-btn right" onclick="scrollCarousel(this, 1)">❯</button>
+          </div>
+        `;
+      } else {
+        imagesHtml = `<div class="carousel-container"><div class="carousel"><img src="${API_BASE}/api/uploads/${encodeURIComponent(imgArr[0])}" alt="Reisebild"></div></div>`;
+      }
     }
 
     const descHtml = p.description ? `<p class="timeline-desc">${escapeHtml(p.description)}</p>` : '';
@@ -444,7 +469,23 @@ function bindPopupToMarker(feature, marker) {
   const norm = normalizeProperties(props);
   const key = tripKey(norm.user, norm.trip);
   const imgArr = Array.isArray(props.images) ? props.images : [];
-  const preview = imgArr.length > 0 ? `<img class="popup-preview" src="${API_BASE}/api/uploads/${encodeURIComponent(imgArr[0])}" alt="Vorschau">` : '';
+  
+  let preview = '';
+  if (imgArr.length > 0) {
+    if (imgArr.length > 1) {
+      preview = `
+        <div class="carousel-container" style="margin-bottom: 8px;">
+          <button class="carousel-btn left" onclick="scrollCarousel(this, -1)">❮</button>
+          <div class="carousel">
+            ${imgArr.map(img => `<img class="popup-preview" src="${API_BASE}/api/uploads/${encodeURIComponent(img)}" alt="Vorschau">`).join('')}
+          </div>
+          <button class="carousel-btn right" onclick="scrollCarousel(this, 1)">❯</button>
+        </div>
+      `;
+    } else {
+      preview = `<div class="carousel-container" style="margin-bottom: 8px;"><div class="carousel"><img class="popup-preview" src="${API_BASE}/api/uploads/${encodeURIComponent(imgArr[0])}" alt="Vorschau"></div></div>`;
+    }
+  }
 
   const dt = norm.datetime || props.date || '';
   const dateObj = dt ? new Date(dt) : null;
